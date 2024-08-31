@@ -1,9 +1,12 @@
 BeginPackage["JerryI`Misc`WLJS`Transport`WXFAccelerator`", {"KirillBelov`WebSocketHandler`", "JerryI`Misc`WLJS`Transport`"}]; 
 Begin["`Internal`"]
 
-Global`WLJSIOAddTracking[symbol_] := With[{cli = Global`$Client, name = SymbolName[Unevaluated[symbol]]},
+System`WLJSIOAddTracking;
+System`WLJSIOUpdateSymbol;
+
+WLJSIOAddTracking[symbol_] := With[{cli = Global`$Client, name = SymbolName[Unevaluated[symbol]]},
     WLJSTransportHandler["AddTracking"][symbol, name, cli, Function[{client, value},
-        BinaryWrite[client, encodeFrame[ExportByteArray[Global`WLJSIOUpdateSymbol[name, value], "WXF"] ] ]
+        BinaryWrite[client, encodeFrame[ExportByteArray[WLJSIOUpdateSymbol[name, value], "WXF"] ] ]
     ] ]
 ]
 

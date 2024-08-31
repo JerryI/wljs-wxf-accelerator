@@ -213,17 +213,4 @@ interpretate.handleMessage = (event) => {
     }
 }
 
-core['Global`WLJSIOUpdateSymbol'] = async (args, env) => {
-    const name = interpretate(args[0], env);
-    //console.log("update");
-    //update
-    core[name].data = args[1];
-  
-    //console.log('instance list');
-    //console.log(core[name].instances);
-  
-    for (const inst of Object.values(core[name].instances)) {
-        await inst.update();
-    };
-  }
 
