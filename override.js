@@ -163,6 +163,11 @@ function deserializeWXF(buffer) {
                 //offset = newOffset;
                 let array = readNumericArray(dataView, offset, length, arrayType);
                 offset += array.length;
+
+                if (opts.listQ) { //mixure of lists and (packed) arrays FIXME //cannot treat!
+                    return (new NumericArrayObject(array.array, dims)).normal();
+                }
+
                 return ['JSObject', new NumericArrayObject(array.array, dims)];
             }
             case 65: { // "A" - association
