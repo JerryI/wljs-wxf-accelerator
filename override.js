@@ -163,7 +163,7 @@ function deserializeWXF(buffer) {
                 //offset = newOffset;
                 let array = readNumericArray(dataView, offset, length, arrayType);
                 offset += array.length;
-                return ['JSObject', {buffer: array.array, dims:dims, length:length}];
+                return ['JSObject', new NumericArrayObject(array.array, dims)];
             }
             case 65: { // "A" - association
                 let assoc = {};
@@ -209,6 +209,7 @@ interpretate.handleMessage = (event) => {
         //console.log(parsed);
         interpretate(parsed, {global: global});
     } else {
+        //console.warn('Captured text frame!');
         interpretate(JSON.parse(event.data), {global: global});
     }
 }
