@@ -75,6 +75,58 @@ function readString(dataView, offset, length) {
     return decoder.decode(bytes);
 }
 
+//a tiny math library of functions
+//as a replacement for window.interpretate (too slow for updates)
+const fwxf = {};
+
+fwxf.Ration = (args) => {
+    return args[0]/args[1];
+}
+
+fwxf.Sin = (args) => {
+    if (args.length > 1) {
+        return args.map(Math.sin)
+    }
+    
+    return Math.sin(args[0])
+}
+
+fwxf.Cos = (args) => {
+    if (args.length > 1) {
+        return args.map(Math.cos)
+    }
+    
+    return Math.cos(args[0])
+}
+
+fwxf.Tan = (args) => {
+    if (args.length > 1) {
+        return args.map(Math.tan)
+    }
+    
+    return Math.tan(args[0])
+}
+
+fwxf.Sqrt = (args) => {
+    if (args.length > 1) {
+        return args.map(Math.sqrt)
+    }
+    
+    return Math.sqrt(args[0])
+}
+
+fwxf.Pow = (args) => {
+    if (args.length > 1) {
+        const p = args[args.length - 1];
+        return args.map((el) => Math.pow(el, p))
+    }
+    
+    return Math.pow(args[0], args[1])
+}
+
+fwxf.Pi = (args) => Math.PI 
+fwxf.E = (args) => Math.E
+
 function deserializeWXF(buffer) {
     let dataView = new DataView(buffer);
     let offset = 0;
@@ -101,7 +153,7 @@ function deserializeWXF(buffer) {
                 let head = parseWXF();
                 let args = [];
               
-                //optimizations for numerical Lists
+                //optimizations for numerical Lists bypass all checks
                 if (head == "List") {
                   for (let i = 0; i < length; i++) {
                       args.push(parseWXF({...opts, listQ: true}));
@@ -111,10 +163,20 @@ function deserializeWXF(buffer) {
                   return ['JSObject', args];   
                   
                 }
-              
+
+                
+                
+                //process arguments, bypass all checks
                 for (let i = 0; i < length; i++) {
                   args.push(parseWXF(opts));
-                }                 
+                }      
+                
+                //optimization for lists again!
+                //if bump into non number, but a simbol being inside a list
+                if (opts.listQ) {
+                    return fwxf[head](args); //run a tiny math library to calculate beforehand
+                    //window.interpretate is too slow for updates
+                }
                 
                 return [head, ...args];
                 
