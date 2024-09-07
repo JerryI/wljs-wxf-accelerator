@@ -1,6 +1,6 @@
 {
     "name": "wljs-wxf-accelerator",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "Overrides update methods to use WXF instead of ExpressionJSON",
     "scripts": {
       "build": "node --max-old-space-size=8192 ./node_modules/.bin/rollup --config rollup.config.mjs",
@@ -10,6 +10,7 @@
     "wljs-meta": {
       "kernel": "Override.wl",
       "js": "override.js",
+      "minjs": "override.js",
       "priority": 980000,
       "category": "Core"
     },
