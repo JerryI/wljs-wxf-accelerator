@@ -12,7 +12,9 @@
       "js": "override.js",
       "minjs": "override.js",
       "priority": 980000,
-      "category": "Core"
+      "category": "Core",
+      "figureExportRequired": true,
+      "cellExportRequired": true        
     },
     "repository": {
       "type": "git",
