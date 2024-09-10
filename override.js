@@ -83,6 +83,10 @@ fwxf.Ration = (args) => {
     return args[0]/args[1];
 }
 
+fwxf.Rational = (args) => {
+    return args[0]/args[1];
+}
+
 fwxf.Sin = (args) => {
     if (args.length > 1) {
         return args.map(Math.sin)
