@@ -163,7 +163,7 @@ function deserializeWXF(buffer) {
                       args.push(parseWXF({...opts, listQ: true}));
                   }
                   
-                  if (opts.listQ) return args;
+                  if (opts.listQ || opts.assocQ) return args;
                   return ['JSObject', args];   
                   
                 }
@@ -177,7 +177,7 @@ function deserializeWXF(buffer) {
                 
                 //optimization for lists again!
                 //if bump into non number, but a simbol being inside a list
-                if (opts.listQ) {
+                if (opts.listQ || opts.assocQ) {
                     return fwxf[head](args); //run a tiny math library to calculate beforehand
                     //window.interpretate is too slow for updates
                 }
@@ -208,6 +208,11 @@ function deserializeWXF(buffer) {
                 offset = newOffset;
                 let str = readString(dataView, offset, length);
                 offset += length;
+
+                if (opts.listQ || opts.assocQ) { //if inside list, just paste JS object directly
+                    return str;
+                }
+
                 return "'"+str+"'";
             }
             case 193: // "Á" - packed array
@@ -230,21 +235,28 @@ function deserializeWXF(buffer) {
                 let array = readNumericArray(dataView, offset, length, arrayType);
                 offset += array.length;
 
-                if (opts.listQ) { //mixure of lists and (packed) arrays FIXME //cannot treat!
+                if (opts.listQ || opts.assocQ) { //mixure of lists and (packed) arrays FIXME //cannot treat!
                     return (new NumericArrayObject(array.array, dims)).normal();
                 }
 
                 return ['JSObject', new NumericArrayObject(array.array, dims)];
             }
+            case 45: { // rule in association
+                return [parseWXF(opts), parseWXF(opts)];
+            }
+
             case 65: { // "A" - association
                 let assoc = {};
                 let { value: length, offset: newOffset } = readVarint(dataView, offset);
                 offset = newOffset;
                 for (let i = 0; i < length; i++) {
-                    let key = parseWXF();
-                    let value = parseWXF();
-                    assoc[key] = value;
+                    let keyvalue = parseWXF({...opts, assocQ:true});
+                    //let value = parseWXF();
+                    assoc[keyvalue[0]] = keyvalue[1];
                 }
+
+                if (opts.listQ || opts.assocQ) return assoc;
+
                 return ['JSObject', assoc];
             }
             case 67: { // "C" - signed 8-bit integer
